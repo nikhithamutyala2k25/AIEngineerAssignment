@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Dashboard</title>
+
+    <!-- Correctly link the external CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Email Dashboard</h1>
+
+    <!-- Connect Gmail -->
+    <div class="form-container">
+        <h3>Connect Gmail</h3>
+        <p>Click the button below to connect your Gmail account securely using OAuth2.</p>
+        <a href="http://127.0.0.1:5000/connect_gmail">
+            <button class="connect-btn">Connect Gmail</button>
+        </a>
+    </div>
+
+    <!-- Upload CSV -->
+    <div class="form-container">
+        <h3>Upload CSV</h3>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="csvFile">Select CSV File:</label>
+            <input type="file" id="csvFile" accept=".csv" required>
+            <button type="submit">Upload CSV</button>
+        </form>
+    </div>
+
+    <!-- CSV Preview -->
+    <div class="csv-preview">
+        <h3>CSV Preview (Top 5 Rows)</h3>
+        <table id="csv-preview-table">
+            <thead>
+                <tr></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Email Customization and Scheduling -->
+    <div class="form-container">
+        <h3>Schedule Emails</h3>
+        <form id="emailForm">
+            <label for="content">Email Content:</label>
+            <textarea id="content" name="content" rows="4" placeholder="Write your email content with placeholders like [First Name], [Email]"></textarea>
+
+            <div>
+                <h3>Insert Columns as Placeholders</h3>
+                <button type="button" id="insertPlaceholdersBtn">Insert Placeholders</button>
+                <div id="columnsContainer"></div> <!-- This will hold the list of detected columns -->
+            </div>
+
+            <label for="subject">Email Subject:</label>
+            <input type="text" id="subject" name="subject" placeholder="Enter subject" required>
+
+            <label for="from_email">From Email:</label>
+            <input type="email" id="from_email" name="from_email" placeholder="Your email address" required>
+
+            <label for="schedule_time">Schedule Time (ISO Format):</label>
+            <input type="datetime-local" id="schedule_time" name="schedule_time" required>
+
+            <button type="submit">Schedule Emails</button>
+        </form>
+    </div>
+
+    <!-- Analytics Toggle -->
+    <button class="toggle-analytics-btn" id="toggleAnalyticsBtn">Show Analytics</button>
+
+    <!-- Email Analytics -->
+    <div class="analytics-container" id="analyticsContainer" style="display: none;">
+        <h3>Email Analytics</h3>
+        <div id="analytics-summary">
+            <p><strong>Total Sent:</strong> <span id="total-sent">0</span></p>
+            <p><strong>Total Failed:</strong> <span id="total-failed">0</span></p>
+            <p><strong>Total Pending:</strong> <span id="total-pending">0</span></p>
+        </div>
+        <h4>Detailed Status</h4>
+        <table id="analytics-table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Delivery Status</th>
+                    <th>Opened</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Detailed analytics rows will be dynamically added -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Handle CSV upload and detect columns
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('csvFile');
+            formData.append('file', fileInput.files[0]);
+
+            fetch("http://127.0.0.1:5000/upload_csv", {
+                method: "POST",
+                body: formData,
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.columns) {
+                    const columnsContainer = document.getElementById("columnsContainer");
+                    columnsContainer.innerHTML = ''; // Clear previous columns
+
+                    data.columns.forEach((col) => {
+                        const button = document.createElement("button");
+                        button.textContent = `[${col}]`;
+                        button.type = "button";
+                        button.addEventListener("click", function () {
+                            const contentBox = document.getElementById("content");
+                            contentBox.value += ` [${col}] `;
+                        });
+                        columnsContainer.appendChild(button);
+                    });
+                }
+
+                // Display CSV preview
+                const tableHead = document.querySelector("#csv-preview-table thead tr");
+                const tableBody = document.querySelector("#csv-preview-table tbody");
+
+                tableHead.innerHTML = "";
+                tableBody.innerHTML = "";
+
+                if (data.preview && data.preview.length > 0) {
+                    // Add headers
+                    Object.keys(data.preview[0]).forEach(header => {
+                        const th = document.createElement("th");
+                        th.textContent = header;
+                        tableHead.appendChild(th);
+                    });
+
+                    // Add rows
+                    data.preview.slice(0, 5).forEach(row => {
+                        const tr = document.createElement("tr");
+                        Object.values(row).forEach(value => {
+                            const td = document.createElement("td");
+                            td.textContent = value;
+                            tr.appendChild(td);
+                        });
+                        tableBody.appendChild(tr);
+                    });
+                }
+            })
+            .catch((error) => alert("Error uploading file: " + error));
+        });
+
+        // Handle Email Scheduling
+        document.getElementById("emailForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.schedule_time = new Date(data.schedule_time).toISOString();
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/schedule_email", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                alert(result.message || "Emails scheduled successfully!");
+            } catch (error) {
+                console.error("Error scheduling emails:", error);
+                alert("Failed to schedule emails.");
+            }
+        });
+
+        // Toggle Analytics visibility
+        document.getElementById("toggleAnalyticsBtn").addEventListener("click", () => {
+            const analyticsContainer = document.getElementById("analyticsContainer");
+            if (analyticsContainer.style.display === "none" || analyticsContainer.style.display === "") {
+                analyticsContainer.style.display = "block";
+                fetchAnalytics();
+                document.getElementById("toggleAnalyticsBtn").textContent = "Hide Analytics";
+            } else {
+                analyticsContainer.style.display = "none";
+                document.getElementById("toggleAnalyticsBtn").textContent = "Show Analytics";
+            }
+        });
+
+        // Fetch and Display Analytics
+        async function fetchAnalytics() {
+            try {
+                const response = await fetch("http://127.0.0.1:5000/analytics");
+                const data = await response.json();
+
+                // Update summary
+                document.getElementById("total-sent").textContent = data.sent;
+                document.getElementById("total-failed").textContent = data.failed;
+                
+
+                // Update detailed table
+                const tableBody = document.querySelector("#analytics-table tbody");
+                tableBody.innerHTML = "";
+                data.emailStatuses.forEach(status => {
+                    const tr = document.createElement("tr");
+                    ["email", "status", "deliveryStatus", "opened"].forEach(key => {
+                        const td = document.createElement("td");
+                        td.textContent = status[key];
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Error fetching analytics:", error);
+                alert("Failed to fetch analytics.");
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,159 @@
+/* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+h1, h3 {
+    color: #2c3e50;
+}
+
+/* Form Container Styling */
+.form-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.form-container h3 {
+    margin-top: 0;
+}
+
+/* Buttons Styling */
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Input Fields Styling */
+input[type="text"], input[type="email"], input[type="datetime-local"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Textarea */
+textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+/* Placeholder Styling */
+button[type="button"] {
+    background-color: #e74c3c;
+    padding: 6px 15px;
+    border-radius: 3px;
+    font-size: 14px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+button[type="button"]:hover {
+    background-color: #c0392b;
+}
+
+/* CSV Preview Table */
+.csv-preview {
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#csv-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#csv-preview-table th, #csv-preview-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#csv-preview-table th {
+    background-color: #3498db;
+    color: white;
+}
+
+/* Analytics Section */
+.analytics-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+#analytics-summary p {
+    margin: 10px 0;
+}
+
+#analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#analytics-table th, #analytics-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+#analytics-table th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+/* Toggle Analytics Button */
+.toggle-analytics-btn {
+    background-color: #f39c12;
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.toggle-analytics-btn:hover {
+    background-color: #e67e22;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .form-container, .csv-preview, .analytics-container {
+        padding: 15px;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    textarea {
+        min-height: 100px;
+    }
+}

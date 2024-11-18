@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Dashboard</title>
+</head>
+<body>
+    <h1>Email Sending Dashboard</h1>
+    <p>Total Sent: {{ stats['sent'] }}</p>
+    <p>Failed: {{ stats['failed'] }}</p>
+    <p>Scheduled: {{ stats['scheduled'] }}</p>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">Upload CSV File:</label>
+        <input type="file" name="file" id="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <form action="/send_email" method="post">
+        <input type="text" name="subject" placeholder="Subject" required>
+        <input type="email" name="recipient" placeholder="Recipient Email" required>
+        <textarea name="body" placeholder="Email Body" required></textarea>
+        <button type="submit">Send Email</button>
+    </form>
+
+    <form action="/schedule_email" method="post">
+        <input type="text" name="subject" placeholder="Subject" required>
+        <input type="email" name="recipient" placeholder="Recipient Email" required>
+        <textarea name="body" placeholder="Email Body" required></textarea>
+        <input type="text" name="time" placeholder="Scheduled Time (YYYY-MM-DD HH:MM:SS)" required>
+        <button type="submit">Schedule Email</button>
+    </form>
+</body>
+</html>
