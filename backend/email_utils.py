@@ -16,7 +16,7 @@ EMAIL_STATUSES = {}
 
 # Retrieve SendGrid API key from environment variable (or replace with your actual key)
 SENDGRID_API_KEY = os.getenv("
-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", "YOUR_ACTUAL_API_KEY")  # Replace with your actual SendGrid API key
+sendgridapikey", "YOUR_ACTUAL_API_KEY")  # Replace with your actual SendGrid API key
 
 def send_email(subject, to_email, body):
     """
